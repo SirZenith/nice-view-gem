@@ -45,6 +45,29 @@ void fill_background(lv_obj_t *canvas) {
     lv_canvas_fill_bg(canvas, LVGL_BACKGROUND, LV_OPA_COVER);
 }
 
+void draw_image(lv_obj_t *canvas, const lv_image_dsc_t img, int x, int y) {
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    lv_draw_image_dsc_t dsc;
+    lv_draw_image_dsc_init(&dsc);
+
+    dsc.src = &img;
+    lv_area_t coords = {10, 10, 10 + img.header.w - 1, 10 + img.header.h - 1};
+    lv_draw_image(&layer, &dsc, &coords);
+    lv_canvas_finish_layer(canvas, &layer);
+}
+
+void draw_label(lv_obj_t *canvas, lv_draw_label_dsc_t *desc, const char *text, int x, int y) {
+    desc->text = text;
+    lv_area_t pos = {x, y};
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+    lv_draw_label(&layer, desc, &pos);
+    lv_canvas_finish_layer(canvas, &layer);
+}
+
 void init_label_dsc(lv_draw_label_dsc_t *label_dsc, lv_color_t color, const lv_font_t *font,
                     lv_text_align_t align) {
     lv_draw_label_dsc_init(label_dsc);

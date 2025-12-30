@@ -2,15 +2,13 @@
 #include <zephyr/kernel.h>
 #include "wpm.h"
 #include "../assets/custom_fonts.h"
+#include "util.h"
 
 LV_IMG_DECLARE(gauge);
 LV_IMG_DECLARE(grid);
 
 static void draw_gauge(lv_obj_t *canvas, const struct status_state *state) {
-    lv_draw_image_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
-
-    lv_canvas_draw_img(canvas, 16, 44 + BUFFER_OFFSET_MIDDLE, &gauge, &img_dsc);
+    draw_image(canvas, gauge, 16, 44 + BUFFER_OFFSET_MIDDLE);
 }
 
 static void draw_needle(lv_obj_t *canvas, const struct status_state *state) {
@@ -52,12 +50,7 @@ static void draw_needle(lv_obj_t *canvas, const struct status_state *state) {
     lv_canvas_draw_line(canvas, points, 2, &line_dsc);
 }
 
-static void draw_grid(lv_obj_t *canvas) {
-    lv_draw_image_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
-
-    lv_canvas_draw_img(canvas, 0, 65 + BUFFER_OFFSET_MIDDLE, &grid, &img_dsc);
-}
+static void draw_grid(lv_obj_t *canvas) { draw_image(canvas, grid, 0, 65 + BUFFER_OFFSET_MIDDLE); }
 
 static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_line_dsc_t line_dsc;
@@ -111,7 +104,9 @@ static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
 static void draw_label(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_label_dsc_t label_left_dsc;
     init_label_dsc(&label_left_dsc, LVGL_FOREGROUND, &pixel_operator_mono, LV_TEXT_ALIGN_LEFT);
-    lv_canvas_draw_text(canvas, 0, 101 + BUFFER_OFFSET_MIDDLE, 25, &label_left_dsc, "WPM");
+
+    draw_label(canvas, &label_left_dsc, "WPM", 0, 101 + BUFFER_OFFSET_MIDDLE);
+    // lv_canvas_draw_text(canvas, 0, 101 + BUFFER_OFFSET_MIDDLE, 25, &label_left_dsc, "WPM");
 
     lv_draw_label_dsc_t label_dsc_wpm;
     init_label_dsc(&label_dsc_wpm, LVGL_FOREGROUND, &pixel_operator_mono, LV_TEXT_ALIGN_RIGHT);
@@ -119,7 +114,9 @@ static void draw_label(lv_obj_t *canvas, const struct status_state *state) {
     char wpm_text[6] = {};
 
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
-    lv_canvas_draw_text(canvas, 26, 101 + BUFFER_OFFSET_MIDDLE, 42, &label_dsc_wpm, wpm_text);
+
+    draw_label(canvas, &label_dsc_wpm, wpm_text, 0, 101 + BUFFER_OFFSET_MIDDLE);
+    // lv_canvas_draw_text(canvas, 26, 101 + BUFFER_OFFSET_MIDDLE, 42, &label_dsc_wpm, wpm_text);
 }
 
 void draw_wpm_status(lv_obj_t *canvas, const struct status_state *state) {
