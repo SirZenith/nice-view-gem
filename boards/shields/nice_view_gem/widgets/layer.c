@@ -15,6 +15,6 @@ void draw_layer_status(lv_obj_t *canvas, const struct status_state *state) {
         to_uppercase(text);
     }
 
-    draw_label(canvas, &label_dsc, text, 0, 146 + BUFFER_OFFSET_BOTTOM);
+    draw_text(canvas, &label_dsc, text, 0, 146 + BUFFER_OFFSET_BOTTOM);
     // lv_canvas_draw_text(canvas, 0, 146 + BUFFER_OFFSET_BOTTOM, 68, &label_dsc, text);
 }

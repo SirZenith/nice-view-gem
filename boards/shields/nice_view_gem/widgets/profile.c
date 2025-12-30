@@ -8,12 +8,17 @@ static void draw_inactive_profiles(lv_obj_t *canvas, const struct status_state *
 }
 
 static void draw_active_profile(lv_obj_t *canvas, const struct status_state *state) {
+    int offset = state->active_profile_index * 7;
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
     lv_draw_rect_dsc_t rect_white_dsc;
     init_rect_dsc(&rect_white_dsc, LVGL_FOREGROUND);
 
-    int offset = state->active_profile_index * 7;
-
-    lv_canvas_draw_rect(canvas, 18 + offset, 129 + BUFFER_OFFSET_BOTTOM, 3, 3, &rect_white_dsc);
+    lv_area_t rect = {18 + offset, 129 + BUFFER_OFFSET_BOTTOM, 3, 3};
+    lv_draw_rect(&layer, &rect_white_dsc, &rect);
+    // lv_canvas_draw_rect(canvas, 18 + offset, 129 + BUFFER_OFFSET_BOTTOM, 3, 3, &rect_white_dsc);
+    lv_canvas_finish_layer(canvas, &layer);
 }
 
 void draw_profile_status(lv_obj_t *canvas, const struct status_state *state) {

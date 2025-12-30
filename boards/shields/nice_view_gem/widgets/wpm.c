@@ -46,8 +46,23 @@ static void draw_needle(lv_obj_t *canvas, const struct status_state *state) {
     int needleEndX = centerX + (int)(radius * cos(angleRad));
     int needleEndY = centerY + (int)(radius * sin(angleRad));
 
-    lv_point_t points[2] = {{needleStartX, needleStartY}, {needleEndX, needleEndY}};
-    lv_canvas_draw_line(canvas, points, 2, &line_dsc);
+    // lv_point_t points[2] = {{needleStartX, needleStartY}, {needleEndX, needleEndY}};
+    // lv_canvas_draw_line(canvas, points, 2, &line_dsc);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    lv_draw_line_dsc_t dsc;
+    lv_draw_line_dsc_init(&dsc);
+    // dsc.round_end = 1;
+    // dsc.round_start = 1;
+    dsc.p1.x = needleStartX;
+    dsc.p1.y = needleStartY;
+    dsc.p2.x = needleEndX;
+    dsc.p2.y = needleEndY;
+    lv_draw_line(&layer, &dsc);
+
+    lv_canvas_finish_layer(canvas, &layer);
 }
 
 static void draw_grid(lv_obj_t *canvas) { draw_image(canvas, grid, 0, 65 + BUFFER_OFFSET_MIDDLE); }
@@ -59,20 +74,31 @@ static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
 
     int baselineY = 97 + BUFFER_OFFSET_MIDDLE;
 
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
 #if IS_ENABLED(CONFIG_NICE_VIEW_GEM_WPM_FIXED_RANGE)
     int max = CONFIG_NICE_VIEW_GEM_WPM_FIXED_RANGE_MAX;
     if (max == 0) {
         max = 100;
     }
 
-    int value = 0;
-    for (int i = 0; i < 10; i++) {
+    int value = state->wpm[0] > max ? max : state->wpm[0];
+    line_dsc.p2.x = 0;
+    line_dsc.p2.y = baselineY - (value * 32 / max);
+
+    for (int i = 1; i < 10; i++) {
         value = state->wpm[i];
         if (value > max) {
             value = max;
         }
-        points[i].x = 0 + i * 7.4;
-        points[i].y = baselineY - (value * 32 / max);
+
+        line_dsc.p1.x = line_dsc.p2.x;
+        line_dsc.p1.y = line_dsc.p2.y;
+        line_dsc.p2.x = 0 + i * 7.4;
+        line_dsc.p2.y = baselineY - (value * 32 / max);
+
+        lv_draw_line(&layer, &line_dsc);
     }
 #else
     int max = 0;
@@ -92,20 +118,30 @@ static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
         range = 1;
     }
 
-    for (int i = 0; i < 10; i++) {
-        points[i].x = 0 + i * 7.4;
-        points[i].y = baselineY - (state->wpm[i] - min) * 32 / range;
+    int value = state->wpm[0] > max ? max : state->wpm[0];
+    line_dsc.p2.x = 0;
+    line_dsc.p2.y = baselineY - (state->wpm[0] - min) * 32 / range;
+
+    for (int i = 1; i < 10; i++) {
+        line_dsc.p1.x = line_dsc.p2.x;
+        line_dsc.p1.y = line_dsc.p2.y;
+        line_dsc.p2.x = 0 + i * 7.4;
+        line_dsc.p2.y = baselineY - (state->wpm[i] - min) * 32 / range;
+
+        lv_draw_line(&layer, &line_dsc);
     }
 #endif
 
-    lv_canvas_draw_line(canvas, points, 10, &line_dsc);
+    // lv_canvas_draw_line(canvas, points, 10, &line_dsc);
+
+    lv_canvas_finish_layer(canvas, &layer);
 }
 
 static void draw_label(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_label_dsc_t label_left_dsc;
     init_label_dsc(&label_left_dsc, LVGL_FOREGROUND, &pixel_operator_mono, LV_TEXT_ALIGN_LEFT);
 
-    draw_label(canvas, &label_left_dsc, "WPM", 0, 101 + BUFFER_OFFSET_MIDDLE);
+    draw_text(canvas, &label_left_dsc, "WPM", 0, 101 + BUFFER_OFFSET_MIDDLE);
     // lv_canvas_draw_text(canvas, 0, 101 + BUFFER_OFFSET_MIDDLE, 25, &label_left_dsc, "WPM");
 
     lv_draw_label_dsc_t label_dsc_wpm;
@@ -115,7 +151,7 @@ static void draw_label(lv_obj_t *canvas, const struct status_state *state) {
 
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
 
-    draw_label(canvas, &label_dsc_wpm, wpm_text, 0, 101 + BUFFER_OFFSET_MIDDLE);
+    draw_text(canvas, &label_dsc_wpm, wpm_text, 0, 101 + BUFFER_OFFSET_MIDDLE);
     // lv_canvas_draw_text(canvas, 26, 101 + BUFFER_OFFSET_MIDDLE, 42, &label_dsc_wpm, wpm_text);
 }
 

@@ -58,7 +58,7 @@ void draw_image(lv_obj_t *canvas, const lv_image_dsc_t img, int x, int y) {
     lv_canvas_finish_layer(canvas, &layer);
 }
 
-void draw_label(lv_obj_t *canvas, lv_draw_label_dsc_t *desc, const char *text, int x, int y) {
+void draw_text(lv_obj_t *canvas, lv_draw_label_dsc_t *desc, const char *text, int x, int y) {
     desc->text = text;
     lv_area_t pos = {x, y};
 
