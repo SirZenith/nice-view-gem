@@ -70,7 +70,6 @@ static void draw_grid(lv_obj_t *canvas) { draw_image(canvas, grid, 0, 65 + BUFFE
 static void draw_graph(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_line_dsc_t line_dsc;
     init_line_dsc(&line_dsc, LVGL_FOREGROUND, 2);
-    lv_point_t points[10];
 
     int baselineY = 97 + BUFFER_OFFSET_MIDDLE;
 
